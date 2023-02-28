@@ -1,12 +1,11 @@
 package ru.javarush.cryptoanaliser.rakhimov.controler;
 
-import ru.javarush.cryptoanaliser.rakhimov.commands.Action;
-import ru.javarush.cryptoanaliser.rakhimov.commands.Decoder;
-import ru.javarush.cryptoanaliser.rakhimov.commands.Encoder;
+import ru.javarush.cryptoanaliser.rakhimov.commands.*;
 
 public enum Actions {
     ENCODE(new Encoder()),
-    DECODE(new Decoder());
+    DECODE(new Decoder()),
+    BRUTE(new Brute());
 
     private final Action action;
 

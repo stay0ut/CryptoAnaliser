@@ -1,26 +1,54 @@
 package ru.javarush.cryptoanaliser.rakhimov.commands;
 
+import ru.javarush.cryptoanaliser.rakhimov.constants.Strings;
 import ru.javarush.cryptoanaliser.rakhimov.entity.Result;
 import ru.javarush.cryptoanaliser.rakhimov.entity.ResultCode;
 import ru.javarush.cryptoanaliser.rakhimov.exception.ApplicationException;
 import ru.javarush.cryptoanaliser.rakhimov.util.PathFinder;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Encoder implements Action {
     @Override
     public Result execute(String[] parameters) {
         String txtFile = parameters[0];
-        String encryptFile = parameters[0];
+        String encryptFile = parameters[1];
+        int key = Integer.parseInt(parameters[2]);
         Path path = Path.of(PathFinder.getRoot() + txtFile);
         try {
-            List<String> strings = Files.readAllLines(path);
+            char[] strings = Files.readAllLines(path).
+                    toString().
+                    toCharArray();
+            char[] alphabet = Strings.ALPHABET.toCharArray();
+            ArrayList<Character> alphabetList = new ArrayList<>();
+            for (char c : alphabet) {
+                alphabetList.add(c);
+            }
+            Collections.rotate(alphabetList, key);
+            char[] resultChars = new char[strings.length];
+            for (int i = 0; i < strings.length; i++) {
+                for (int j = 0; j < alphabet.length; j++) {
+                    int charCode1 = strings[i];
+                    int charCode2 = alphabet[j];
+                    if (charCode1 == charCode2) {
+                        resultChars[i] = alphabetList.get(j);
+                        break;
+                    }
+                }
+            }
+            StringWriter writer = new StringWriter();
+            writer.write(resultChars, 0, resultChars.length);
+            Path pathOut = Path.of(encryptFile);
+            Files.writeString(pathOut, writer.toString().
+                    trim());
         } catch (IOException e) {
-            throw new ApplicationException("Not found", e);
+            throw new ApplicationException("IO error", e);
         }
-        return new Result(ResultCode.OK, "read all bytes" + path);
+        return new Result(ResultCode.OK, "File is ready" + path);
     }
 }
